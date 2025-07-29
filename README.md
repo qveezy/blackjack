@@ -1,2 +1,2 @@
-# blackjack
-python game blackjack
+# BlackJack
+Python game blackjack
