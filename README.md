@@ -1,3 +1,4 @@
 # BlackJack
-#Python game blackjack
+Python game blackjack
+
 *not buggy piece of shit anymore*
