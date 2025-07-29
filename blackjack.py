@@ -1,112 +1,175 @@
-'''
-VERY BUGGY PIECE OF SHIT
-'''
+#NOT BUGGY PIECE OF SHIT#
+
 import random
 
-deck=[2,3,4,5,6,7,8,9,10,"J","Q","K","A",2,3,4,5,6,7,8,9,10,"J","Q","K","A",2,3,4,5,6,7,8,9,10,"J","Q","K","A",2,3,4,5,6,7,8,9,10,"J","Q","K","A",]
+cards = [2 , 3 , 4 , 5 , 6, 7 , 8 , 9 , 10 , 'J', 'Q' , 'K' , 'A'] * 4
 
-playerIn=True
-dealerIn=True
-status=True
-con=True
-player_balance=100
 
-dealerHand=[]
-playerHand=[]
 
-def dealHand(turn):
 
-    card=random.choice(deck)
-    turn.append(card)
-    deck.remove(card)
+
+player_cards=[]
+dealer_cards=[]
+
+
+def load_balance():
+    try:
+        with open("balance.txt" , "r") as f:
+            return int(f.read())
+    except FileNotFoundError:
+        return 100
+    except ValueError:
+        return 100
+
+def create_deck():
+    global  cards
+    cards = [2 , 3 , 4 , 5 , 6, 7 , 8 , 9 , 10 , 'J', 'Q' , 'K' , 'A'] * 4
+    return cards
+
+
+
+balance=load_balance()
+
+def save_balance(balance):
+    with open("balance.txt", "w") as f:
+        f.write(str(balance))
+
+
+def shuffle():
+    random.shuffle(cards)
+
+
+def deal(turn , num):
+    for x in range(num):
+        card=random.choice(cards)
+        turn.append(card)
+        cards.remove(card)
+    return card
 
 def total(turn):
     total=0
-    face= ["K",'Q','J']
+    face=['J','Q','K']
     for card in turn:
         if card in range(1,11):
             total+=card
         elif card in face:
-            total += 10
+            total+=10
         else:
-            if total>11:
+            if total > 11:
                 total+=1
             else:
                 total+=11
     return total
 
-def revealDealerHand():
-    if len(dealerHand) == 2:
-        return dealerHand[0]
-    elif len(dealerHand) > 2:
-        return dealerHand[0] , dealerHand[1]
-
-for _ in range(2):
-    dealHand(dealerHand)
-    dealHand(playerHand)
-
-while con==True:
-    while status==True:
-        print("Welcome to BlackJack!")
-        print(f"Your balance is {player_balance}")
-        bet=input("Enter your bet: ")
-        if bet.isdigit():
-            bet=int(bet)
-            player_balance=player_balance-bet
-            status=False
-        else:
-            print("\n PLEASE Enter numbers \n")
-            continue
-
-    while playerIn or dealerIn:
-        print(f'Dealer has {revealDealerHand()} and X')
-        print(f'You have {playerHand} and total {total(playerHand)}')
-        if playerIn:
-            stayorhit=input("1. Stay or 2. Hit?: ")
-        if total(dealerHand)>16:
-            dealerIn = False
-        else:
-            dealHand(dealerHand)
-        if stayorhit == '1':
-            playerIn = False
-        else:
-            dealHand(playerHand)
-        if total(playerHand) >= 21:
-            break
-        elif total(dealerHand) >= 21:
-            break
 
 
-    if total(playerHand)==21:
-        print(f"You have {playerHand} for a total {total(playerHand)} and dealer has {dealerHand} for a total of {total(dealerHand)}")
-        print("You win!")
-        player_balance+=bet*2
-    elif total(dealerHand)==21:
-        print(f"You have {playerHand} for a total {total(playerHand)} and dealer has {dealerHand} for a total of {total(dealerHand)}")
-        print("Dealer wins!")
-    elif total(playerHand) > 21:
-        print(f"You have {playerHand} for a total {total(playerHand)} and dealer has {dealerHand} for a total of {total(dealerHand)}")
-        print("You bust!")
-    elif total(dealerHand) > 21:
-        print(f"You have {playerHand} for a total {total(playerHand)} and dealer has {dealerHand} for a total of {total(dealerHand)}")
-        print("Dealer busts!")
-    elif 21 - total(dealerHand) < 21 - total(playerHand) :
-        print(f"You have {playerHand} for a total {total(playerHand)} and dealer has {dealerHand} for a total of {total(dealerHand)}")
-        print("Dealer wins!")
-    elif 21 - total(dealerHand) > 21 - total(playerHand) :
-        print(f"You have {playerHand} for a total {total(playerHand)} and dealer has {dealerHand} for a total of {total(dealerHand)}")
-        print("Player win!")
-        player_balance += bet * 2
-    elif total(dealerHand) == total(playerHand) :
-        print(f"You have {playerHand} for a total {total(playerHand)} and dealer has {dealerHand} for a total of {total(dealerHand)}")
-        print("Draw!")
-        player_balance += bet
-        print(f"Your balance after game is {player_balance}")
 
-    ask = input("Do you want to continue?(1-Yes/2-No): ")
-    if ask == 1:
-        continue
-    elif ask == 2:
-        break
-    else:
-        print("Please write numbers")
+def revealplayer():
+    print(f"Player has {' | '.join(str(cards) for cards in player_cards)} , TOTAL: {total(player_cards)}")
+
+def revealdealer():
+    if len(dealer_cards)==2:
+        print(f"Dealer has {dealer_cards[0]} | X , TOTAL: X")
+    elif len(dealer_cards)>2:
+        print(f"Dealer has {' | '.join(str(cards) for cards in dealer_cards)}, TOTAL: {total(dealer_cards)}")
+
+def blackjack():
+
+
+    face=['J','Q','K']
+    allowedbet=[5,10,15,20]
+    global balance
+
+    print("-------------------------")
+    print("| Welcome to BlackJack! |")
+    print("-------------------------")
+
+    print(f"Your balance is {balance}")
+
+
+
+    game_over = False
+
+    while not game_over:
+        bet_input = input("Place a bet [5/10/15/20] : ")
+        if bet_input.isdigit():
+            bet = int(bet_input)
+            if bet in allowedbet:
+                balance-=bet
+                deal(player_cards, 2)
+                deal(dealer_cards, 2)
+                shuffle()
+                revealdealer()
+                revealplayer()
+
+                if dealer_cards[0] == 'A' :
+                    insurance = input("Do you want to take insurance, it will cost 10?(y/n): ").lower().strip()
+                    if insurance == "y":
+                        balance -= 10
+                        if total(dealer_cards) == 21:
+                            balance += bet + 10
+                            break
+
+
+                    elif insurance == "n":
+                        if total(dealer_cards) == 21:
+                            print("You lost!")
+                            break
+                    else:
+                        continue
+
+                while True:
+
+                    if total(player_cards) == 21 and len(player_cards) == 2:
+                        print("You won!")
+                        balance+=bet*2
+                        break
+                    choice=input("Y to hit , N to stay: ").lower().strip()
+                    if choice == 'y':
+                        deal(player_cards, 1)
+                        revealplayer()
+                        if total(player_cards) > 21:
+                            print("Bust! You lost!")
+                            game_over = True
+                            break
+                    elif choice == 'n':
+                        break
+                    else:
+                        print("Please enter Y or N.")
+
+                if not game_over:
+                    if total(player_cards) !=21:
+                        while total(dealer_cards) < 17:
+                            deal(dealer_cards, 1)
+                        print(f"Dealer has {' | '.join(str(cards) for cards in dealer_cards)} , TOTAL: {total(dealer_cards)}")
+
+                        if total(dealer_cards) > 21 or total(player_cards) > total(dealer_cards):
+                            print("You win")
+                            balance+=bet*2
+                        elif total(player_cards) == total(dealer_cards):
+                            print("Draw")
+                            balance+=bet
+                        else:
+                            print('Dealer wins.')
+
+                    save_balance(balance)
+                    game_over = True
+
+if __name__ == "__main__":
+    while True:
+        blackjack()
+        shuffle()
+        player_cards.clear()
+        dealer_cards.clear()
+        create_deck()
+
+
+        while True:
+            again = input("Do you want to play again(Y/N): ").lower().strip()
+
+            if again == 'y':
+                break
+            elif again == "n":
+                exit()
+            else:
+                continue
