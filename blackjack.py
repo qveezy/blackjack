@@ -67,6 +67,10 @@ def total(turn):
 def revealplayer():
     print(f"Player has {' | '.join(str(cards) for cards in player_cards)} , TOTAL: {total(player_cards)}")
 
+def fullrevealdealer():
+    print(f"Dealer has {' | '.join(str(cards) for cards in dealer_cards)}, TOTAL: {total(dealer_cards)}")
+    
+
 def revealdealer():
     if len(dealer_cards)==2:
         print(f"Dealer has {dealer_cards[0]} | X , TOTAL: X")
@@ -141,7 +145,7 @@ def blackjack():
                     if total(player_cards) !=21:
                         while total(dealer_cards) < 17:
                             deal(dealer_cards, 1)
-                        print(f"Dealer has {' | '.join(str(cards) for cards in dealer_cards)} , TOTAL: {total(dealer_cards)}")
+                        fullrevealdealer()
 
                         if total(dealer_cards) > 21 or total(player_cards) > total(dealer_cards):
                             print("You win")
@@ -158,10 +162,10 @@ def blackjack():
 if __name__ == "__main__":
     while True:
         blackjack()
-        shuffle()
         player_cards.clear()
         dealer_cards.clear()
         create_deck()
+        shuffle()
 
 
         while True:
